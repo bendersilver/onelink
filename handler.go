@@ -3,7 +3,7 @@
 // (превью, instant app, URL-сканер) не сожгло её раньше времени:
 //
 //	GET/POST {prefix}/{unq}/		— «подготовка»: HTML без пометки использованной
-//	GET/POST {prefix}/{unq}/go_to	— «факт перехода»: атомарная пометка + редирект
+//	GET {prefix}/{unq}/go_to		— «факт перехода»: атомарная пометка + редирект
 //
 // Подключается к чужому серверу как обычный http.Handler:
 //
@@ -21,19 +21,20 @@ type abstractStore interface {
 	DeleteRedirectParam(string)
 }
 
-type Handler struct {
+type handler struct {
 	store   abstractStore
 	keyName string
 }
 
-func New(store abstractStore, key string) http.Handler {
+func New(store abstractStore, key string) http.HandlerFunc {
 	if store == nil {
 		panic("onelink: store is nil")
 	}
-	return &Handler{store: store, keyName: key}
+	h := &handler{store: store, keyName: key}
+	return h.GoToHandler
 }
 
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *handler) GoToHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet, http.MethodPost: // pass
 	default:
