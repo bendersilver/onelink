@@ -68,9 +68,9 @@ func (h *handler) GoToHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		switch method {
 		case http.MethodGet:
-			postTmpl.Execute(w, map[string]string{"RedirectURL": url})
+			getTmpl.Execute(w, map[string]string{"RedirectURL": url})
 		case http.MethodPost:
-			getTmpl.Execute(w, map[string]any{"Action": url, "Params": param})
+			postTmpl.Execute(w, map[string]any{"Action": url, "Params": param})
 		}
 		return
 	}
